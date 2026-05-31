@@ -52,10 +52,10 @@ class AskResponse(BaseModel):
 
 #Before answering any question, we check — is this person actually logged in? We do that by reading their JWT token.
 
-from fastapi.security import OAuth2PasswordBearer
-get_token=OAuth2PasswordBearer(tokenUrl="auth/login")
+from fastapi.security import HTTPBearer,HTTPAuthorizationCredentials
+security=HTTPBearer()
 
-def get_current_user(token:str=Depends(get_token),db:Session=Depends(get_db)):           #reads the JWT token and finds the user in database
+def get_current_user(credentials:HTTPAuthorizationCredentials=Depends(security),db:Session=Depends(get_db)):           #reads the JWT token and finds the user in database
     credentials_exception=HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -64,7 +64,7 @@ def get_current_user(token:str=Depends(get_token),db:Session=Depends(get_db)):  
 
     try:
         payload=jwt.decode(
-            token,
+            credentials.credentials,
             os.getenv("SECRET_KEY"),
             algorithms=["HS256"]
             # payload is now a dictionary containing what we stored
@@ -80,7 +80,7 @@ def get_current_user(token:str=Depends(get_token),db:Session=Depends(get_db)):  
     except JWTError:
         raise credentials_exception
     
-    from models import User
+    from models.user import User
 
     user=db.query(User).filter(User.email==email).first()
 

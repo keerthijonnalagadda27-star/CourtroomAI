@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, openapi
 from fastapi.middleware.cors import CORSMiddleware
 from google.auth import default
 from database import Base,engine
@@ -22,6 +22,37 @@ app=FastAPI(
 # origins = the addresses we allow to talk to our backend
 #Why 5173 specifically?
 # That's the default port Vite uses — Vite is the tool that runs your React app locally. We haven't set it up yet but when we do, React will automatically start at 5173. So we're just preparing for that now.
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema=get_openapi(
+        title="CourtroomAI",
+        version="1.0.0",
+        description="AI-powered legal aid for every Indian",
+        routes=app.routes,
+    )
+    openapi_schema["components"]["securitySchemes"]={
+        "BearerAuth":{
+            "type":"http",
+            "scheme":"bearer",
+            "bearerFormat":"JWT",
+        }
+    }
+    for path in openapi_schema["paths"].values():
+        for method in path.values():
+            method["security"]=[{"BearerAuth": []}]
+
+
+
+
+
+    app.openapi_schema=openapi_schema
+    return app.openapi_schema
+app.openapi=custom_openapi
+
+
+
 
 
 app.add_middleware(
