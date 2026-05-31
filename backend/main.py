@@ -1,8 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from google.auth import default
 from database import Base,engine
 from models import user
 from auth import router as auth_router
+from routers.ask import router as ask_router
+from routers.ask import ChatHistory
+from fastapi.openapi.utils import get_openapi
+#get_openapi is FastAPI's built-in function that generates the openapi JSON. 
+
+
+
 
 #idi mana fastapi app ni create chestundi ..ante like oka key engine start chestunnatu..it starts our app
 app=FastAPI(
@@ -27,7 +35,7 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 app.include_router(auth_router)
-
+app.include_router(ask_router)
 @app.get("/")
 def home():
     return {
@@ -35,3 +43,9 @@ def home():
         "message": "Legal aid for every Indian",
         "status": "running"
     }
+     
+
+
+
+#      Swagger UI reads something called an openapi_schema — it's basically a big JSON document that describes your entire API. Every endpoint, every request format, every response format. Swagger reads this JSON and draws the visual page you see.
+# By default FastAPI generates this JSON automatically. But it doesn't include BearerAuth by default. So we're replacing the default generator with our own custom one that adds BearerAuth.

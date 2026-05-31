@@ -7,7 +7,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
-from google import genai
+from groq import Groq
+
 from dotenv import load_dotenv
 load_dotenv()
 # load our .env file to get the GEMINI_API_KEY chala important endukante mana ahh key git ki upload cheyyakudadhu security kosam
@@ -101,14 +102,18 @@ def ask_gemini(question:str,context:str)->str:
     For serious matters, please consult a qualified lawyer."
     """
 
-    client=genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    response=client.models.generate_content(
-        model="gemini-2.0-flash-lite",
-        contents=prompt
+    client=Groq(api_key=os.getenv("GROQ_API_KEY"))
+    response=client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
     )
     
-    #generate_content() sends the prompt to Gemini API
-    return response.text
+    return response.choices[0].message.content
 
 
 def answer_legal_question(question:str)->str:
