@@ -19,9 +19,6 @@ app=FastAPI(
     version="1.0.0"
 )
 
-# origins = the addresses we allow to talk to our backend
-#Why 5173 specifically?
-# That's the default port Vite uses — Vite is the tool that runs your React app locally. We haven't set it up yet but when we do, React will automatically start at 5173. So we're just preparing for that now.
 
 def custom_openapi():
     if app.openapi_schema:
@@ -52,7 +49,9 @@ def custom_openapi():
 app.openapi=custom_openapi
 
 
-
+# origins = the addresses we allow to talk to our backend
+#Why 5173 specifically?
+# That's the default port Vite uses — Vite is the tool that runs your React app locally. We haven't set it up yet but when we do, React will automatically start at 5173. So we're just preparing for that now.
 
 
 app.add_middleware(
