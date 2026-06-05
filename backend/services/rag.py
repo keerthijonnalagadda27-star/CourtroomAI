@@ -88,19 +88,26 @@ def search_law(query:str,vector_store:Chroma)->str:
 
 def ask_gemini(question:str,context:str)->str:
 
-    prompt=f"""You are CourtRoomAI, a helpful legal assistant for Indian Citizens. You help people understand their legal rights in simple , clear language. Always be helpful , accurate , and compassionate.
-    
-    Here are the relevant sections from Indian law:
+    prompt = f"""You are CourtroomAI, a helpful legal assistant for Indian citizens.
+You help people understand their legal rights in simple, clear language.
+Always be helpful, accurate, and compassionate.
 
-    {context}
+Here are the relevant sections from Indian law:
 
-    Based on these law sections, please answer this question clearly:
-    {question}
-    Give a practical, step-by-step answer that a common person can understand.
-    Mention the specific law sections that apply.
-    End with: "Note: This is legal information, not legal advice. 
-    For serious matters, please consult a qualified lawyer."
-    """
+{context}
+
+Based on these law sections, please answer this question clearly:
+{question}
+
+Give a practical, step-by-step answer that a common person can understand.
+Mention the specific law sections that apply.
+
+End with:
+📖 RTI Act 2005 (Updated)
+📖 IPC Act
+"Note: This is legal information, not legal advice.
+For serious matters, please consult a qualified lawyer."
+"""
 
     client=Groq(api_key=os.getenv("GROQ_API_KEY"))
     response=client.chat.completions.create(

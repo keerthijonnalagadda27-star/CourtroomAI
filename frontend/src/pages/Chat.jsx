@@ -8,6 +8,7 @@ import {useState, useEffect, useRef} from 'react'
 // useRef — used to auto-scroll to bottom when new message arrives
 
 import {useNavigate} from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
 
 import api from '../api/axios'
 
@@ -83,7 +84,7 @@ function Chat(){
             {/* HEADER */}
          <div style={{
             padding:'1rem 2rem',
-            backgroundColor:'#1e293b',
+            backgroundColor:'#1E293B',
             display:'flex',
             justifyContent:'space-between',
             alignItems:'center',
@@ -114,34 +115,85 @@ function Chat(){
                 flexDirection:'column',
                 gap:'1rem'
             }}>
-                {messages.map((msg,index)=>(
-                    <div key={index} style={{
-                        display:'flex',
-                        justifyContent: msg.sender==='user' ? 'flex-end' : 'flex-start'
-                    }}>
-                        <div style={{
-                            maxWidth:'70%',
-                            padding:'1rem',
-                            borderRadius:msg.sender==='user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                            backgroundColor: msg.sender==='user' ? '#6366f1' : '#1e293b',
-                            color:'#f8fafc',
-                            whiteSpace:'pre-wrap',
-                        }}>
-                            {msg.sender==='ai'&& (
-                                <div style={{
-                                    fontSize:'0.75rem',
-                                    color:'#94a3b8',
-                                    marginBottom:'0.5rem'
+                {messages.map((msg, index) => (
+  <div
+    key={index}
+    style={{
+      display: 'flex',
+      justifyContent:
+        msg.sender === 'user'
+          ? 'flex-end'
+          : 'flex-start'
+    }}
+  >
+    
+    <div
+      style={{
+        display: 'flex',
+        gap: '10px',
+        flexDirection:
+          msg.sender === 'user'
+            ? 'row-reverse'
+            : 'row',
+        alignItems: 'center'
+      }}
+    >
+      {/* Avatar */}
 
-                                }}>
-                                    ⚖️ CourtroomAI
-                                </div>
-                            )}
-                            {msg.text}
-                    </div>
-                    </div>
-                ))}
+      <div
+        style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          border:'1px solid #334155',
+          backgroundColor:
+            "transparent",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0
+        }}
+      >
+        {msg.sender === 'user' ? '🧑‍⚖️' : '⚖️'}
+      </div>
 
+      {/* Message Bubble */}
+
+      <div
+        style={{
+          maxWidth: '65%',
+          padding: '1rem',
+          borderRadius:
+            msg.sender === 'user'
+              ? '18px 18px 4px 18px'
+              : '18px 18px 18px 4px',
+          backgroundColor:
+            msg.sender === 'user'
+              ? '#6366f1'
+              : '#1E293B',
+          color: '#f8fafc',
+          whiteSpace: 'pre-wrap'
+        }}
+      >
+        {msg.sender === 'ai' && (
+          <div
+            style={{
+              fontSize: '0.75rem',
+              color: '#94a3b8',
+              marginBottom: '0.5rem'
+            }}
+          >
+            CourtroomAI
+          </div>
+        )}
+
+        <ReactMarkdown>
+          {msg.text}
+        </ReactMarkdown>
+      </div>
+    </div>
+  </div>
+))}
                 {/* LOADING INDICATOR */}
 
                 {loading && (
@@ -149,14 +201,14 @@ function Chat(){
             <div style={{
               padding: '1rem',
               borderRadius: '18px 18px 18px 4px',
-              backgroundColor: '#1e293b',
+              backgroundColor: '#1E293B',
               color: '#94a3b8',
               fontSize: '0.95rem'
             }}>
               ⚖️ CourtroomAI is thinking...
             </div>
           </div>
-        )}
+)}
 
 
 
