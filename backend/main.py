@@ -1,6 +1,5 @@
-from fastapi import FastAPI, openapi
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from google.auth import default
 from database import Base,engine
 from models import user
 from auth import router as auth_router

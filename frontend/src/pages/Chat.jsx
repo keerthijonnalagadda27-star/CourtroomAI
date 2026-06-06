@@ -47,6 +47,7 @@ function Chat(){
         setQuestion('')
         setLoading(true)
 
+
         try{
             const response=await api.post('/legal/ask',{
                 question:question
@@ -59,6 +60,54 @@ function Chat(){
         } finally {
             setLoading(false)
         }
+    }
+    const handleGenerateNotice=async()=>{
+      // this function calls the notice generator endpoint
+      // downloads the PDF directly to user's computer
+
+      if(!question.trim()) return 
+
+      setLoading(true)
+
+      try{
+        const response=await api.post('/legal/generate-notice',
+          {question:question},
+          {responseType:'blob'}
+          // responseType: 'blob' tells axios to treat response as binary file
+          // blob = Binary Large Object — raw file data
+          // without this axios tries to parse PDF as JSON and fails
+        )
+
+        const url=window.URL.createObjectURL(new Blob([response.data]))
+        //createObjectURL creates a temp URL pointing to the pdf data
+        //new Blob([response.data]) wrap chestadi data into a blob obj
+        //ee url ni mana regular file url la vadachu
+
+        const link=document.createElement('a')
+        // create a temporary invisible <a> tag
+        // we use this to trigger the download
+
+        link.setAttribute('download','legal_notice.pdf')
+        //download attribute browser ki download cheyamani cheptadi instead of navigating
+
+        document.body.appendChild(link)
+        link.href=url
+
+        link.click()
+        document.body.removeChild(link)
+
+        setMessages(prev=>[...prev,{
+          sender:'ai',
+          text:'📄 Your legal notice has been generated and downloaded! Check your Downloads folder.'
+        }])
+      }
+      catch(err){
+        setMessages(prev=>[...prev,{
+          sender:'ai',
+          text:'Sorry, could not generate the notice. Please try again.'
+        }])
+      }
+      setLoading(false)
     }
         const handleKeyPress=(e)=>{
             if(e.key==='Enter' && !e.shiftKey){
@@ -260,6 +309,24 @@ function Chat(){
                 }}>
 
                 {loading ? '...' : 'Send ➤ '}
+                </button>
+                <button
+                    onClick={handleGenerateNotice}
+                    disabled={loading || !question.trim()}
+                    style={{
+                      padding: '0.75rem 1rem',
+                      backgroundColor: loading || !question.trim() ? '#334155' : '#10b981',
+    // green button for notice generator
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      cursor: loading || !question.trim() ? 'not-allowed' : 'pointer',
+                      fontSize: '0.95rem',
+                      fontWeight: 'bold',
+                      whiteSpace: 'nowrap'
+                   }}
+                >
+                  📄 Notice
                 </button>
             </div>
         </div>

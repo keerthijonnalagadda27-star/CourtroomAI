@@ -12,7 +12,7 @@ function Login(){
      // we call navigate('/chat') after successful login 
 
     const[isLogin,setLogin]=useState(true)
-    const[username, setUsername]=useState('')
+    const[fullName, setFullName]=useState('')
     const[email,setEmail]=useState('')
     const[password,setPassword]=useState('')
     const[error,setError]=useState('')
@@ -121,9 +121,9 @@ function Login(){
                     <div style={{ marginBottom:'1rem' }}>
                         <input
                         type='text'
-                        placeholder='Username'
-                        value={username}
-                        onChange={(e)=>setUsername(e.target.value)}
+                        placeholder='Full Name'
+                        value={fullName}
+                        onChange={(e)=>setFullName(e.target.value)}
                         style={{
                             width:'100%',
                             padding:'0.75rem',

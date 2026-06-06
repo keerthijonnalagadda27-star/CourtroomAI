@@ -6,6 +6,8 @@ import os
 
 from fastapi import APIRouter,HTTPException,Depends,status
 
+from fastapi.responses import Response
+
 from sqlalchemy.orm import Session
 
 from sqlalchemy import Column,String,Integer,DateTime,ForeignKey, Text
@@ -19,7 +21,7 @@ from jose import JWTError,jwt
 
 from database import Base,get_db
 
-import os
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -129,3 +131,38 @@ def ask_question(
  # FastAPI uses AskResponse schema to format the response
     # sends back question and answer
     # user_id and created_at are not in AskResponse so they stay hidden
+
+
+
+@router.post("/generate-notice")
+def generate_notice(
+    request: AskRequest,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    try:
+        from services.notice_generator import generate_legal_notice
+
+        pdf_bytes = generate_legal_notice(request.question)
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition":
+                "attachment; filename=legal_notice.pdf"
+            }
+        )
+
+    except Exception as e:
+       print("NOTICE ERROR:", e)
+       raise HTTPException(
+        status_code=500,
+        detail=str(e)
+    )
+
+    
+  
+# Content-Disposition tells browser to download the file
+            # attachment means download, not open in browser
+            # filename= sets the downloaded file's name
