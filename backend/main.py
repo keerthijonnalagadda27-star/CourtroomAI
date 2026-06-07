@@ -58,7 +58,8 @@ app.add_middleware(
     allow_origins=[
     "http://localhost:5173",
     "https://courtroomai.vercel.app",
-    "https://courtroomai-m66stzkgk-sree-keerthi-s-projects.vercel.app"],
+    "https://courtroomai-m66stzkgk-sree-keerthi-s-projects.vercel.app"
+],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
