@@ -123,27 +123,47 @@ For serious matters, please consult a qualified lawyer."
     return response.choices[0].message.content
 
 
-def answer_legal_question(question:str)->str:
+def answer_legal_question(question: str) -> str:
+    try:
+        if os.path.exists("./chroma_db"):
+            print("Loading existing vector store...")
+            vector_store = load_vector_store()
+        else:
+            print("Building vector store for the first time...")
+            data_folder = os.path.join(os.path.dirname(__file__), "../data")
 
-    if os.path.exists("./chroma_db"):
-        print("Loading existing vector store...")
-        vector_store=load_vector_store()
-    else:
-        print("Building vctor store for the first time...")
+            if not os.path.exists(data_folder):
+                raise Exception(f"Data folder not found: {data_folder}")
 
-        data_folder=os.path.join(os.path.dirname(__file__),"../data")
+            pdf_files = [f for f in os.listdir(data_folder) if f.endswith('.pdf')]
+            if not pdf_files:
+                raise Exception(f"No PDF files found in {data_folder}")
 
-        text=load_pdfs(data_folder)
+            print(f"Found PDFs: {pdf_files}")
+            text = load_pdfs(data_folder)
+            chunks = split_into_chunks(text)
+            vector_store = create_vector_store(chunks)
 
-        chunks=split_into_chunks(text)
+        print(f"Searching for: {question}")
+        context = search_law(question, vector_store)
+        print("Asking Groq...")
+        answer = ask_gemini(question, context)
+        return answer
 
-        vector_store=create_vector_store(chunks)
-    print(f"Searching for: {question}")
+    except Exception as e:
+        print(f"RAG Error: {str(e)}")
+        print("Falling back to direct Groq...")
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        prompt = f"""You are CourtroomAI, a helpful legal assistant for Indian citizens.
+Answer this legal question using your knowledge of Indian law (IPC, CrPC, RTI Act, Consumer Protection Act):
 
-    context=search_law(question,vector_store)
+{question}
 
-    print("Asking GEMINI...")
-
-    answer=ask_gemini(question,context)
-
-    return answer
+Give a practical step-by-step answer. Mention specific law sections that apply.
+End with: "Note: This is legal information, not legal advice. For serious matters, please consult a qualified lawyer."
+"""
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        return response.choices[0].message.content
