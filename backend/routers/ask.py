@@ -102,16 +102,26 @@ def ask_question(
     current_user=Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    import traceback
     try:
         from services.rag import answer_legal_question
         answer = answer_legal_question(request.question)
-        return {"question": request.question, "answer": answer}
     except Exception as e:
-        error_details = traceback.format_exc()
-        print(f"FULL ERROR: {error_details}")
-        return {"question": request.question, "answer": f"DEBUG: {str(e)}"}
+        print(f"Error: {str(e)}")
+        return {"question": request.question, "answer": "Sorry, something went wrong. Please try again."}
 
+    try:
+        chat = ChatHistory(
+            user_id=current_user.id,
+            question=request.question,
+            answer=answer
+        )
+        db.add(chat)
+        db.commit()
+        db.refresh(chat)
+    except Exception as db_error:
+        print(f"DB Error: {str(db_error)}")
+
+    return {"question": request.question, "answer": answer}
  # FastAPI uses AskResponse schema to format the response
     # sends back question and answer
     # user_id and created_at are not in AskResponse so they stay hidden
