@@ -97,38 +97,20 @@ router=APIRouter(prefix="/legal",tags=["Legal"])
 # so our endpoint will be /legal/ask
 
 @router.post("/ask")
-
 def ask_question(
-    request:AskRequest,
+    request: AskRequest,
     current_user=Depends(get_current_user),
-    db:Session=Depends(get_db)
+    db: Session = Depends(get_db)
 ):
+    import traceback
     try:
         from services.rag import answer_legal_question
-
-        answer=answer_legal_question(request.question)
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"AI service error: {str(e)}"
-        )
-    
-
-    try:
-        chat = ChatHistory(
-            user_id=current_user.id,
-            question=request.question,
-            answer=answer
-        )
-        db.add(chat)
-        db.commit()
-        db.refresh(chat)
-        return chat
-    except Exception as db_error:
-        print(f"DB Error: {str(db_error)}")
-    # even if saving fails, return the answer
+        answer = answer_legal_question(request.question)
         return {"question": request.question, "answer": answer}
+    except Exception as e:
+        error_details = traceback.format_exc()
+        print(f"FULL ERROR: {error_details}")
+        return {"question": request.question, "answer": f"DEBUG: {str(e)}"}
 
  # FastAPI uses AskResponse schema to format the response
     # sends back question and answer
