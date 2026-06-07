@@ -115,18 +115,20 @@ def ask_question(
         )
     
 
-    chat=ChatHistory(
-        user_id=current_user.id,
-        question=request.question,
-        answer=answer
-    )
-    db.add(chat)
-    db.commit()
-    db.refresh(chat)
-    
-     # reloads from database so we get the auto-filled id and created_at
-    
-    return chat
+    try:
+        chat = ChatHistory(
+            user_id=current_user.id,
+            question=request.question,
+            answer=answer
+        )
+        db.add(chat)
+        db.commit()
+        db.refresh(chat)
+        return chat
+    except Exception as db_error:
+        print(f"DB Error: {str(db_error)}")
+    # even if saving fails, return the answer
+        return {"question": request.question, "answer": answer}
 
  # FastAPI uses AskResponse schema to format the response
     # sends back question and answer
