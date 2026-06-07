@@ -96,7 +96,7 @@ router=APIRouter(prefix="/legal",tags=["Legal"])
 # prefix="/legal" means every endpoint here starts with /legal
 # so our endpoint will be /legal/ask
 
-@router.post("/ask",response_model=AskResponse)
+@router.post("/ask")
 
 def ask_question(
     request:AskRequest,
