@@ -10,10 +10,14 @@ import {useState, useEffect, useRef} from 'react'
 import {useNavigate} from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n/index.js'
+
 import api from '../api/axios'
 
 function Chat(){
     const navigate=useNavigate()
+    const {t}= useTranslation()
     const[messages,setMessages]=useState([
         {
             sender:'ai',
@@ -119,6 +123,46 @@ function Chat(){
         localStorage.removeItem('token')
         window.location.href='/'
        }
+       const handleVoiceInput=()=>{
+        const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition
+
+        if(!SpeechRecognition) {
+          alert('Voice input not supported. Please use Chrome or Edge.')
+          return
+        }
+        const recognition= new SpeechRecognition()
+        // creating a new speech recognition instance like it means creating a new microphone session
+
+        recognition.lang=i18n.language==='hi'?'hi-IN': i18n.language==='te'?'te-IN':'en-IN'
+        recognition.maxAlternatives = 1
+
+
+        recognition.continuous=false
+        // ante oka pause first time raagane aapey anutundi vinadam
+
+        recognition.start()
+
+        setQuestion('🎤 Listening...')
+        recognition.onresult=(event)=>{
+          const transcript=event.results[0][0].transcript
+
+          // event .results mana results set anamata..first[0] ante first result and second [0] ante the most confidence version of that result ani .... ee .transcript ah result lo unna actual text ni istundhi...
+
+          setQuestion(transcript)
+
+        }
+
+        recognition.onerror=(event)=>{
+          console.error('Voice error: ',event.error)
+          setQuestion('')
+          alert('Voice input failed. Please try again.')
+        }
+
+        recognition.onend=()=>{
+          console.log('Voice recognition ended.')
+  
+        }
+       }
     
     return(
         <div style={{
@@ -143,6 +187,26 @@ function Chat(){
             color:'#f8fafc',
             margin:0
          }}>⚖️ CourtroomAI </h2>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            {['en', 'hi', 'te'].map(lang => (
+              <button
+                key={lang}
+                onClick={() => i18n.changeLanguage(lang)}
+                style={{
+                  padding: '0.3rem 0.7rem',
+                  backgroundColor: i18n.language === lang ? '#6366f1' : '#334155',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '0.75rem',
+                  fontWeight: i18n.language === lang ? 'bold' : 'normal'
+         }}
+       >
+          {lang === 'en' ? 'EN' : lang === 'hi' ? 'हि' : 'తె'}
+        </button>
+     ))}
+   </div>
             <button onClick={handleLogout} style={{
                 padding:'0.5rem 1rem',
                 backgroundColor:'#ef4444',
@@ -152,7 +216,7 @@ function Chat(){
                 cursor:'pointer',
                 fontSize:'0.875rem'
             }}> 
-                Logout
+                {t('logout')}
             </button>
          </div> 
             {/* messages AREA */}
@@ -254,7 +318,7 @@ function Chat(){
               color: '#94a3b8',
               fontSize: '0.95rem'
             }}>
-              ⚖️ CourtroomAI is thinking...
+              ⚖️ {t('thinking')}...
             </div>
           </div>
 )}
@@ -279,7 +343,7 @@ function Chat(){
                 value={question}
                 onChange={(e)=>setQuestion(e.target.value)}
                 onKeyDown={handleKeyPress}
-                placeholder='Describe your legal problem...(Press Enter to send)'
+                placeholder={t('placeholder')}
                 rows={2}
                 style={{
                     flex:1,
@@ -294,6 +358,24 @@ function Chat(){
                     lineHeight:'1.5'
                 }}
                 />
+
+                <button onClick={
+                  handleVoiceInput
+                }
+                style={{
+                  padding:'0.75rem',
+                  backgroundColor:'#334155',
+                  color:'white',
+                  border:'none',
+                  borderRadius:'12px',
+                  cursor:'pointer',
+                  fontSize:'1.2rem',
+                  whiteSpace:'nowrap'
+                }}
+                >
+                  🎤
+                </button>
+
                 <button onClick={handleSend}
                 disabled={loading || !question.trim()} 
                 style={{
@@ -308,7 +390,7 @@ function Chat(){
                     whiteSpace: 'nowrap'
                 }}>
 
-                {loading ? '...' : 'Send ➤ '}
+                {loading ? '...' : `${t('send')} ➤`}
                 </button>
                 <button
                     onClick={handleGenerateNotice}
@@ -326,7 +408,7 @@ function Chat(){
                       whiteSpace: 'nowrap'
                    }}
                 >
-                  📄 Notice
+                  📄 {t('notice')}
                 </button>
             </div>
         </div>

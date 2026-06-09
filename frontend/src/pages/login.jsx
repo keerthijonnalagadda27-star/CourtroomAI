@@ -6,10 +6,16 @@ import {useNavigate} from 'react-router-dom'
 
 import api from '../api/axios'
 
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n/index.js'
+
 function Login(){
     const navigate=useNavigate()
      // useNavigate() gives us the navigate function
      // we call navigate('/chat') after successful login 
+     const {t} =useTranslation()
+     // t is the translation function
+     // t('login') returns "Login" in English, "लॉगिन" in Hindi etc
 
     const[isLogin,setLogin]=useState(true)
     const[fullName, setFullName]=useState('')
@@ -60,35 +66,66 @@ function Login(){
 
     }
     return(
+    <>
+    
+    <div style={{
+        position: 'fixed',
+        top: '1rem',
+        right: '1rem',
+        display: 'flex',
+        gap: '0.5rem',
+        zIndex: 999
+    }}>
+        {['en', 'hi', 'te'].map(lang => (
+            <button
+                key={lang}
+                onClick={() => i18n.changeLanguage(lang)}
+                style={{
+                    padding: '0.3rem 0.7rem',
+                    backgroundColor: i18n.language === lang ? '#6366f1' : '#334155',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                    fontWeight: i18n.language === lang ? 'bold' : 'normal'
+                }}
+            >
+                {lang === 'en' ? 'EN' : lang === 'hi' ? 'हि' : 'తె'}
+            </button>
+        ))}
+    </div>
+
+    {/* MAIN LOGIN CARD */}
+    <div style={{
+        minHeight:'100vh',
+        display:'flex',
+        flexDirection:'column',
+        alignItems:'center',
+        justifyContent:'center',
+        backgroundColor:'#0f172a',
+        fontFamily:'sans-serif'
+    }}>
         <div style={{
-            minHeight:'100vh',
-            display:'flex',
-            flexDirection:'column',
-            alignItems:'center',
-            justifyContent:'center',
-            backgroundColor:'#0f172a',
-            fontFamily:'sans-serif'
+            backgroundColor:'#1e293b',
+            padding:'2rem',
+            borderRadius:'12px',
+            width:'100%',
+            maxWidth:'400px',
+            boxShadow:'0 4px 24px rgba(0,0,0,0.4)'
         }}>
+            <h1 style={{ color:'#f8fafc', textAlign:'center', marginBottom:'0.5rem' }}>
+                ⚖️ {t('appName')}
+            </h1>
+            <p style={{ color:'#94a3b8', textAlign:'center', marginBottom:'2rem' }}>
+                {t('tagline')}
+            </p>
             <div style={{
-                backgroundColor:'#1e293b',
-                padding:'2rem',
-                borderRadius:'12px',
-                width:'100%',
-                maxWidth:'400px',
-                boxShadow:'0 4px 24px rgba(0,0,0,0.4)'
-            }}>
-                <h1 style={{ color:'#f8fafc', textAlign:'center', marginBottom:'0.5rem' }}>
-                    ⚖️ CourtroomAI
-                </h1>
-                <p style={{ color:'#94a3b8', textAlign:'center', marginBottom:'2rem' }}>
-                    Legal aid for every Indian 
-                </p>
-                <div style={{
-                    display:'flex',
-                    marginBottom:'1.5rem',
-                    borderRadius:'8px',
-                    overflow:'hidden'}}>
-                    <button 
+                display:'flex',
+                marginBottom:'1.5rem',
+                borderRadius:'8px',
+                overflow:'hidden'}}>
+                <button 
                     onClick={()=>setLogin(true)}
                     style={{
                         flex:1,
@@ -100,9 +137,9 @@ function Login(){
                         fontWeight:isLogin?'bold':'normal'
                     }}
                 >
-                        Login
-                    </button>
-                    <button
+                    {t('login')}
+                </button>
+                <button
                     onClick={()=>setLogin(false)}
                     style={{
                         flex:1,
@@ -113,15 +150,16 @@ function Login(){
                         color:'#f8fafc',
                         fontWeight:!isLogin?'bold':'normal'
                     }}
-                    >
-                        Sign Up
-                    </button>
-                </div>
-                {!isLogin && (
-                    <div style={{ marginBottom:'1rem' }}>
-                        <input
+                >
+                    {t('signup')}
+                </button>
+            </div>
+              {/* email field */}
+            {!isLogin && (
+                <div style={{ marginBottom:'1rem' }}>
+                    <input
                         type='text'
-                        placeholder='Full Name'
+                        placeholder={t('fullName')}
                         value={fullName}
                         onChange={(e)=>setFullName(e.target.value)}
                         style={{
@@ -134,15 +172,14 @@ function Login(){
                             fontSize:'1rem',
                             boxSizing:'border-box'
                         }}
-                        />
-                    </div>
-                )}
-                {/* Email FIELD */}
+                    />
+                </div>
+            )}
 
-                <div style={{ marginBottom:'1rem' }}>
-                    <input
+            <div style={{ marginBottom:'1rem' }}>
+                <input
                     type='email'
-                    placeholder='Email'
+                    placeholder={t('email')}
                     value={email}
                     onChange={(e)=>setEmail(e.target.value)}
                     style={{
@@ -155,14 +192,13 @@ function Login(){
                         fontSize:'1rem',
                         boxSizing:'border-box'
                     }}
-                    />
-                </div>
-                {/* PASSWORD FIELD */}
-
-                <div style={{ marginBottom:'1rem' }}>
-                    <input
+                />
+            </div>
+                   {/* password field */}
+            <div style={{ marginBottom:'1rem' }}>
+                <input
                     type='password'
-                    placeholder='Password'
+                    placeholder={t('password')}
                     value={password}
                     onChange={(e)=>setPassword(e.target.value)}
                     style={{
@@ -175,17 +211,16 @@ function Login(){
                         fontSize:'1rem',
                         boxSizing:'border-box'
                     }}
-                    />
-                </div>
-                {error && (
-                    <p style={{ color:'#f87171', marginBottom:'1rem', textAlign:'center' }}>
-                        {error}
-                    </p>
-                )}
+                />
+            </div>
 
-                {/* SUBMIT BUTTON */}
-
-                <button
+            {error && (
+                <p style={{ color:'#f87171', marginBottom:'1rem', textAlign:'center' }}>
+                    {error}
+                </p>
+            )}
+                   {/* submit button */}
+            <button
                 onClick={handleSubmit}
                 disabled={loading}
                 style={{
@@ -197,15 +232,15 @@ function Login(){
                     color:'#f8fafc',
                     fontSize:'1rem',
                     fontWeight:'bold',
-
                     cursor:loading ? 'not-allowed' : 'pointer'
                 }}
-                >
-                    {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Create Account')}
-                </button>
-            </div>
+            >
+                {loading ? t('pleaseWait') : (isLogin ? t('login') : t('createAccount'))}
+            </button>
         </div>
-    )
+    </div>
+    </>
+)
 }
 
 
