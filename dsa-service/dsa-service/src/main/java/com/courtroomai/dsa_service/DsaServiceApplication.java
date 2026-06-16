@@ -4,16 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-/*
-@ symbol ante annotation..ante it is saying to springBoot that idhe main class .. application ikkadnunchi start chey ani cheptundi
-*/
-
 public class DsaServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DsaServiceApplication.class, args);
-//		this line starts the entire spring boot server - starts web server,loads all configurations,makes api ready to receive requests
-
 	}
 
 }
