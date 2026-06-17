@@ -41,6 +41,10 @@ function Chat(){
             navigate('/')
         }
     },[])
+    const[ipcQuery,setIpcQuery]=useState('')
+    const[ipcResults,setIpcResults]=useState([])
+    const[showIpcSearch,setIpcSearch]=useState(false)
+
 
     const handleSend=async()=>{
         if(!question.trim()) return
@@ -163,6 +167,16 @@ function Chat(){
   
         }
        }
+       const handleIpcSearch=()=>{
+        if(!ipcQuery.trim())  return
+        try{
+          const response=await api.get(`/legal/ipc-search?query=${ipcQuery}`)
+          setIpcResults(response.data.results)
+
+        }catch(err){
+          setIpcResults([])
+        }
+       }
     
     return(
         <div style={{
@@ -206,6 +220,22 @@ function Chat(){
           {lang === 'en' ? 'EN' : lang === 'hi' ? 'हि' : 'తె'}
         </button>
      ))}
+
+     <button 
+         onClick={()=> setShowIpcSearch(!showIpcSearch)}
+         style={{
+          padding:'0.5 rem 1 rem',
+          backgroundColor:'#0ea5e9',
+          color:'white',
+          border:'none',
+          borderRadius:'8px',
+          cursor:'pointer',
+          fontSize:'0.8rem',
+          fontWeight:'bold'
+         }}
+         >
+          🔍 IPC Search
+         </button>
    </div>
             <button onClick={handleLogout} style={{
                 padding:'0.5rem 1rem',
@@ -218,6 +248,60 @@ function Chat(){
             }}> 
                 {t('logout')}
             </button>
+          {showIpcSearch && (
+    <div style={{
+        padding: '1rem 1.5rem',
+        backgroundColor: '#1e293b',
+        borderBottom: '1px solid #334155'
+    }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <input
+                value={ipcQuery}
+                onChange={(e) => setIpcQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleIpcSearch()}
+                placeholder="Search IPC section (e.g. 420)"
+                style={{
+                    flex: 1,
+                    padding: '0.6rem',
+                    borderRadius: '8px',
+                    border: '1px solid #334155',
+                    backgroundColor: '#0f172a',
+                    color: '#f8fafc',
+                    fontSize: '0.9rem'
+                }}
+            />
+            <button
+                onClick={handleIpcSearch}
+                style={{
+                    padding: '0.6rem 1.2rem',
+                    backgroundColor: '#0ea5e9',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold'
+                }}
+            >
+                Search
+            </button>
+        </div>
+        {ipcResults.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {ipcResults.map((result, i) => (
+                    <div key={i} style={{
+                        padding: '0.75rem',
+                        backgroundColor: '#0f172a',
+                        borderRadius: '8px',
+                        color: '#cbd5e1',
+                        fontSize: '0.85rem'
+                    }}>
+                        {result}
+                    </div>
+                ))}
+            </div>
+        )}
+    </div>
+)}
          </div> 
             {/* messages AREA */}
             <div style={{

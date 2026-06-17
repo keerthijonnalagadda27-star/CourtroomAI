@@ -160,3 +160,12 @@ def generate_notice(
 # Content-Disposition tells browser to download the file
             # attachment means download, not open in browser
             # filename= sets the downloaded file's name
+
+
+
+@router.get("/ipc-search")
+def ipc_search(query:str,current_user=Depends(get_current_user)):
+    from services.dsa_client import search_ipc
+    results=ipc_search(query)
+    return {"query":query,"results":results}
+          
