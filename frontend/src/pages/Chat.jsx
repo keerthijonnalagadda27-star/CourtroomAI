@@ -43,7 +43,7 @@ function Chat(){
     },[])
     const[ipcQuery,setIpcQuery]=useState('')
     const[ipcResults,setIpcResults]=useState([])
-    const[showIpcSearch,setIpcSearch]=useState(false)
+    const[showIpcSearch,setShowIpcSearch]=useState(false)
 
 
     const handleSend=async()=>{
@@ -282,7 +282,7 @@ function Chat(){
                     fontWeight: 'bold'
                 }}
             >
-                Search
+              🔍 IPC Search
             </button>
         </div>
         {ipcResults.length > 0 && (
