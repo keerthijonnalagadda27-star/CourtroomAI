@@ -167,7 +167,7 @@ function Chat(){
   
         }
        }
-       const handleIpcSearch=()=>{
+       const handleIpcSearch=async()=>{
         if(!ipcQuery.trim())  return
         try{
           const response=await api.get(`/legal/ipc-search?query=${ipcQuery}`)
@@ -224,7 +224,7 @@ function Chat(){
      <button 
          onClick={()=> setShowIpcSearch(!showIpcSearch)}
          style={{
-          padding:'0.5 rem 1 rem',
+          padding:'0.5rem 1rem',
           backgroundColor:'#0ea5e9',
           color:'white',
           border:'none',
