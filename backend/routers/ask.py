@@ -21,7 +21,6 @@ from jose import JWTError,jwt
 
 from database import Base,get_db
 
-
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -104,6 +103,7 @@ def ask_question(
 ):
     try:
         from services.rag import answer_legal_question
+        from services.dsa_client import get_precedents
         answer = answer_legal_question(request.question)
     except Exception as e:
         print(f"Error: {str(e)}")
