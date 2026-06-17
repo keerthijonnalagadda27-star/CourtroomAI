@@ -104,7 +104,15 @@ def ask_question(
     try:
         from services.rag import answer_legal_question
         from services.dsa_client import get_precedents
+
         answer = answer_legal_question(request.question)
+
+        precedents = get_precedents(request.question)
+        if precedents:
+            answer += "\n\n**📚 Relevant Court Precedents:**\n"
+            for p in precedents:
+                answer += f"\n• **{p['title']}** ({p['year']}) — {p['summary']}"
+
     except Exception as e:
         print(f"Error: {str(e)}")
         return {"question": request.question, "answer": "Sorry, something went wrong. Please try again."}
@@ -122,6 +130,8 @@ def ask_question(
         print(f"DB Error: {str(db_error)}")
 
     return {"question": request.question, "answer": answer}
+
+ 
  # FastAPI uses AskResponse schema to format the response
     # sends back question and answer
     # user_id and created_at are not in AskResponse so they stay hidden
@@ -162,10 +172,8 @@ def generate_notice(
             # filename= sets the downloaded file's name
 
 
-
 @router.get("/ipc-search")
-def ipc_search(query:str,current_user=Depends(get_current_user)):
+def ipc_search_endpoint(query: str, current_user=Depends(get_current_user)):
     from services.dsa_client import search_ipc
-    results=ipc_search(query)
-    return {"query":query,"results":results}
-          
+    results = search_ipc(query)
+    return {"query": query, "results": results}
